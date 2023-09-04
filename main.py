@@ -12,7 +12,7 @@ instance = np.array(
     dtype=np.int32
 )
 
-
+# First, create a initial state from 15-Puzzle domain.
 initial_state = FifteenPuzzleState(
     state=instance,
     g=0,
@@ -20,9 +20,10 @@ initial_state = FifteenPuzzleState(
     blank=get_blank(instance),
     oldblank=-1 
 )
-
+# print the state itself.
 print(initial_state)
 
+# call the IDA* Algorithm and call the solve method.
 algorithm = IDAStar(manhattan(instance), initial_state)
 algorithm.solve()
 

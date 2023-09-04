@@ -45,3 +45,17 @@ class FifteenPuzzleState:
                     )
                 )
         return successors
+
+    def __str__(self):
+        msg = "=================\n"
+        msg += " 15-Puzzle State\n"
+        msg += "-----------------\n"
+        for i in range(0, len(self.state)):
+            msg += f" {self.state[i]:2}"
+            if (i+1)%4 == 0:
+                msg += f" \n"
+        msg += "-----------------\n"
+        msg += f"\n g cost : {self.g:>5}\n" + \
+               f" h value: {self.h:>5}\n" + \
+            "=================\n"
+        return msg

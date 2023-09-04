@@ -2,24 +2,21 @@ from typing import Protocol
 
 class ISearchStats(Protocol):
 
-    def get_elapsed_time(self):
+    def get_elapsed_time() -> float:
         ... 
 
-    def clear_stats(self):
+    def clear_stats() -> None:
         ...
 
-    def start_timer(self):
+    def start_timer() -> None:
         ...
 
-    def end_timer(self):
+    def end_timer() -> None:
         ...
 
-    def init_iter(self):
+    def add_gnodes(number_nodes: int) -> None:
         ...
 
-    def add_gnodes(self, number_nodes):
-        ...
-
-    def add_xnodes(self):
+    def add_xnodes(self) -> None:
         ...
         

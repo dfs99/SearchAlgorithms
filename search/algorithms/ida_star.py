@@ -17,30 +17,33 @@ class IDAStar:
         self.next_thresh = NEXT_THRESH_VALUE
 
     def solve(self):
-        # remove previous stats.
+        # try to remove previous stats if exists.
         self.stats.clear_stats()
         # start measuring the elapsed time.
         self.stats.start_timer()
         
         success = False
         while not success:
-            # init stats for the current IDA iteration.
-            # It also saves stats for previous iterations.
-            self.stats.init_iter()
 
             # search iter
             success = self._solve(self.init_state)
 
-            print(f"T: {self.thresh:2} nodos generados: {self.stats.ngenerated_iter}")
-        
+            # print stats for the current iteration.
+            self.stats.show_iter_stats(self.thresh)
+            
             # update thresh.
             self.update_threshold()
 
+            # init stats for the following IDA iteration.
+            # It also saves stats for current iterations.
+            self.stats.saves_iter()
+
         # end measuring the elapsed time.
         self.stats.end_timer()
-        # get the elapsed time.
-        print(f"Elapsed time to solve: {self.stats.get_elapsed_time():5f} sec.")
-
+        
+        # print stats
+        print(self.stats)
+        
 
     def _solve(self, state: IState) -> bool:
 
@@ -61,6 +64,6 @@ class IDAStar:
             # else, update thresh.
             else:
                 self.next_thresh = f_value if f_value < self.next_thresh else self.next_thresh 
-
+        
         return False
          
