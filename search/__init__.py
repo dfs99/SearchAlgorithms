@@ -1,5 +1,5 @@
-from search.domains.fifteenpuzzle import FifteenPuzzle
+from search.domains.npuzzle import NPuzzle
 
 __all__ = [
-    "FifteenPuzzle"
+    "NPuzzle"
 ]

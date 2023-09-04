@@ -2,6 +2,22 @@ from dataclasses import dataclass, field
 from typing import List
 import numpy as np 
 
+AVAILABLE_NPUZZLES = {
+    "8": {
+        "number_cells": 9,
+        "len_board": 3
+    },
+    
+    "15": {
+        "number_cells": 16,
+        "len_board": 4
+    },
+
+    "24": {
+        "number_cells": 25,
+        "len_board": 5
+    }
+}
 
 @dataclass(slots=True)
 class NPuzzleOperators:
@@ -10,21 +26,24 @@ class NPuzzleOperators:
 
 
 @dataclass
-class FifteenPuzzle:
-    number_cells: int = 16
-    len_board: int = 4
+class NPuzzle:
+    n: str
+    number_cells: int = field(default=0, repr=False)
+    len_board: int =field(default=0, repr=False)
+    increment_table: np.ndarray = field(default=None, repr=False)
     operators: List[NPuzzleOperators] = field(default_factory=list, repr=False)
-    increment_table: np.ndarray = field(default_factory=lambda : np.zeros((16, 16, 16), dtype=np.int32), repr=False)
-    terminal_state: List[int] = field(default_factory=lambda : [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15])
-    #initial_state: List[int] = field(default_factory=list)
+    
 
     def __post_init__(self):
+        if self.n not in AVAILABLE_NPUZZLES.keys():
+            raise ValueError(f"[ERROR]: {self.n}-puzzle is not available.")
+        
+        self.number_cells = AVAILABLE_NPUZZLES[self.n]["number_cells"]
+        self.len_board = AVAILABLE_NPUZZLES[self.n]["len_board"]
+        self.increment_table = np.zeros((self.number_cells, self.number_cells, self.number_cells), dtype=np.int32)
+        
         self._init_operators()
         self._init_increment_table()
-
-    #def fetch_state(self):
-        # todo: hacer que se lea desde std in.
-    #    self.initial_state = [14, 13, 15, 7, 11, 12, 9, 5, 6, 0, 2, 1, 4, 8, 10, 3] 
 
     def _init_operators(self):
         for blank in range(0, self.number_cells):
@@ -56,10 +75,19 @@ class FifteenPuzzle:
                     self.increment_table[tile][source][dest] = round( 1 + (np.abs((tile % self.len_board) - (dest % self.len_board)) - np.abs((tile % self.len_board) - (source % self.len_board)) + np.abs(int(tile / self.len_board) - int(dest / self.len_board)) - np.abs(int(tile / self.len_board) - int(source / self.len_board)) )) - 1
 
 
-if __name__ == "__main__":
-    print("testing...")
-    domain = FifteenPuzzle()
-    domain.fetch_state()
-    print(domain)
+def manhattan(state: np.ndarray) -> int:
+    value = 0
+    for i in range(len(state)):
+        if state[i] != 0:
+            value += (np.abs((i%4) - (state[i]%4)) + np.abs(int(i/4) - int(state[i]/4)))
+    return value
+
+
+def get_blank(state: np.ndarray) -> int: 
+    for i in range(0, len(state)):
+        if state[i] == 0:
+            return i
+    raise ValueError(f"[ERROR]: The blank did not appear in the state provided.")
+
 
     

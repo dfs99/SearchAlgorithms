@@ -1,18 +1,18 @@
 from dataclasses import dataclass, field
 from typing import ClassVar, List
 from search.states.istate import IState
-from search.domains.fifteenpuzzle import FifteenPuzzle
+from search.domains.npuzzle import NPuzzle
 import numpy as np
 
 
 @dataclass(slots=True, frozen=True, unsafe_hash=True)
 class FifteenPuzzleState:
-    domain: ClassVar[FifteenPuzzle] = field(default=FifteenPuzzle(), init=False, repr=False) 
-    g: int
-    h: int
+    domain: ClassVar[NPuzzle] = field(default=NPuzzle("15"), init=False, repr=False) 
     state: np.ndarray
-    blank: int
-    oldblank: int
+    g: int
+    h: int 
+    blank: int 
+    oldblank: int 
 
     def get_g(self) -> int:
         return self.g 
@@ -24,7 +24,7 @@ class FifteenPuzzleState:
         # For the 15puzzle it's enough to check that its h-value has reached 0.
         return self.get_h() == 0
 
-    def get_children(self) -> List:
+    def get_children(self) -> List["FifteenPuzzleState"]:
 
         successors: List[FifteenPuzzleState] = []
         
@@ -37,9 +37,9 @@ class FifteenPuzzleState:
                 new_state[newblank] = 0
                 successors.append(
                     FifteenPuzzleState(
+                        state=new_state,
                         g=self.get_g() + 1,
                         h=self.get_h() + FifteenPuzzleState.domain.increment_table[tile][newblank][self.blank],
-                        state=new_state,
                         blank=newblank,
                         oldblank=self.blank
                     )

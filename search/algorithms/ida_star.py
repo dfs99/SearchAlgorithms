@@ -3,13 +3,18 @@ from search.stats.stats import IDAStarStats
 from search.states.states import IState
 from typing import ClassVar
 
+NEXT_THRESH_VALUE = 9999
 
 @dataclass
 class IDAStar:
-    thresh: int
-    init_state: IState = None
+    thresh: int | float
+    next_thresh: int | float = field(default=NEXT_THRESH_VALUE, init=False)    # used to store the min value that exceeds the current T. 
+    init_state: IState
     stats: ClassVar[IDAStarStats] = field(default=IDAStarStats(), init=False)
-    
+
+    def update_threshold(self):
+        self.thresh = self.next_thresh
+        self.next_thresh = NEXT_THRESH_VALUE
 
     def solve(self):
         # remove previous stats.
@@ -29,8 +34,7 @@ class IDAStar:
             print(f"T: {self.thresh:2} nodos generados: {self.stats.ngenerated_iter}")
         
             # update thresh.
-            # TODO: Abstraer la actualización del thresh del algoritmo.
-            self.thresh += 2
+            self.update_threshold()
 
         # end measuring the elapsed time.
         self.stats.end_timer()
@@ -41,7 +45,6 @@ class IDAStar:
     def _solve(self, state: IState) -> bool:
 
         if state.isgoal():
-            #print(f"Solution found")
             return True
 
         children = state.get_children()
@@ -51,10 +54,13 @@ class IDAStar:
         
         for child in children:
             # if h+g <= T keep searching.
-            if child.get_h() + child.get_g() <= self.thresh:
-                
+            f_value = child.get_h() + child.get_g()
+            if  f_value <= self.thresh:
                 if self._solve(child):
                     return True
-        
+            # else, update thresh.
+            else:
+                self.next_thresh = f_value if f_value < self.next_thresh else self.next_thresh 
+
         return False
          
