@@ -50,12 +50,11 @@ class IDAStar:
         if state.isgoal():
             return True
 
-        children = state.get_children()
         # añadir stats.
         self.stats.add_xnodes()                 # take into account the expanded node.
-        self.stats.add_gnodes(len(children))    # take into account the generated nodes.
         
-        for child in children:
+        for child in state.get_children():
+            self.stats.add_gnodes()             # take into account the generated nodes.
             # if h+g <= T keep searching.
             f_value = child.get_h() + child.get_g()
             if  f_value <= self.thresh:

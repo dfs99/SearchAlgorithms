@@ -38,9 +38,9 @@ class IDAStarStats:
         self.ngenerated_iter = 0
         self.nexpanded_iter = 0
 
-    def add_gnodes(self, number_nodes):
+    def add_gnodes(self):
         """Adds # to generated nodes in current iteration."""
-        self.ngenerated_iter += number_nodes
+        self.ngenerated_iter += 1
 
     def add_xnodes(self):
         """Adds 1 to expanded nodes in current iteration."""
