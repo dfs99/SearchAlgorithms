@@ -4,8 +4,11 @@ from search.states.istate import IState
 from search.domains.npuzzle import NPuzzle
 import numpy as np
 
+# To be able to perform a mixed radix representation.
+FACTORIALS = [1.3076744e+12, 87178291200, 6227020800, 479001600, 39916800, 3628800, 362880, 40320, 5040, 720, 120, 24, 6, 2, 1, 1]
 
-@dataclass(slots=True, frozen=True, unsafe_hash=True)
+
+@dataclass(slots=True, frozen=True)
 class FifteenPuzzleState:
     domain: ClassVar[NPuzzle] = field(default=NPuzzle("15"), init=False, repr=False) 
     state: np.ndarray
@@ -41,6 +44,30 @@ class FifteenPuzzleState:
                         blank=newblank,
                         oldblank=self.blank
                     )
+    
+    def __lt__(self, other):
+        if not isinstance(other, FifteenPuzzleState):
+            raise ValueError("Diferent instances!")
+        return (self.g + self.h) < (other.g + other.h)
+    
+    def __hash__(self):
+        
+        # Mixed radix representation from Nathan Sturtevant
+        # https://www.youtube.com/watch?v=YHqoVdvLR6c&t=1807s
+        def mixed_radix_representation(perm):
+            permutation = perm.copy()
+            id = FACTORIALS[0]*permutation[0]
+            for i in range(1, len(permutation)):
+                val = permutation[i-1]
+                for j in range(i, len(permutation)):
+                    if permutation[j] >= val:
+                        permutation[j]-=1
+                id += FACTORIALS[i]*permutation[i]
+                #print(f"fact: {FACTORIALS[i]} * p: {permutation[i]}")
+            return int(id)
+
+        return mixed_radix_representation(self.state)
+            
 
 
     def __str__(self):
